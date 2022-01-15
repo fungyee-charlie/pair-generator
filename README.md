@@ -14,7 +14,7 @@ For example, Suppose we have 4 guys(A,B,C,D) in the team, the perfect schedule i
 It's easy to figure out manually when the team size is small, but when the team getting bigger, it's hard to make a perfect schedule.
 So this project is to help you make a pair plan automatically even with a big team size.
 ## How to use
-In the `Solution.class`, replace the team member's name. If you want to add more member, just put them into the set `teamMembers`
+In the `PairGenerator.class`, replace the team member's name. If you want to add more member, just put them into the set `teamMembers`
 then run the application, you can see the result printed in the console.
 
   
