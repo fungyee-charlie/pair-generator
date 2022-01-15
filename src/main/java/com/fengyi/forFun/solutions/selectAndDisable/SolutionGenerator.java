@@ -34,7 +34,6 @@ public class SolutionGenerator {
                 Pair picked = choosablePairs.get(0);
                 selectedPairs.add(picked);
                 disableRelativePairs(picked);
-                printAllList();
             }
         }
         generatePairSchedule();
@@ -62,7 +61,6 @@ public class SolutionGenerator {
             throw new IllegalStateException("Can't not get the Answer, because this program doesn't support such a large team size");
         }
         Pair lastPicked = selectedPairs.remove(selectedPairs.size() - 1);
-        printPair("roll back pair: ", lastPicked);
         List<Pair> lastDisablePairs = disablePairs.remove(disablePairs.size() - 1);
         choosablePairs.addAll(lastDisablePairs);
         disablePairs.add(Collections.singletonList(lastPicked));
@@ -97,7 +95,6 @@ public class SolutionGenerator {
 
     private void addSelectedToResult() {
         result.add(new ArrayList<>(selectedPairs));
-        printPairList("add selected pairs to result:", selectedPairs);
     }
 
 
@@ -115,15 +112,6 @@ public class SolutionGenerator {
 
     public void printSolution() {
         printNestedPairList("result:", result);
-    }
-
-    private void printAllList() {
-        System.out.println("------------new step--------------");
-        printPairList("selectedPairs pairs:", selectedPairs);
-        printNestedPairList("disable pairs:", disablePairs);
-        printPairList("Choosable pairs:", choosablePairs);
-        printNestedPairList("result:", result);
-
     }
 
     private void printNestedPairList(String message, List<List<Pair>> pairs) {
