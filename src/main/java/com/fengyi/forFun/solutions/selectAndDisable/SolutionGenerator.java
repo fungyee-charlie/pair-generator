@@ -78,25 +78,15 @@ public class SolutionGenerator {
     }
 
     private void disableRelativePairs(Pair picked) {
-        for (Pair pair : choosablePairs) {
-            if (pair.isTheSamePair(picked)) {
-                continue;
-            }
-            if (pair.isRelative(picked)) {
-                pair.disable();
-            }
-        }
+        choosablePairs.stream()
+                .filter(pair -> pair.isRelative(picked))
+                .forEach(Pair::disable);
     }
 
     private void enableRelativePairs(Pair picked) {
-        for (Pair pair : choosablePairs) {
-            if (pair.isTheSamePair(picked)) {
-                continue;
-            }
-            if (pair.isRelative(picked)) {
-                pair.enable();
-            }
-        }
+        choosablePairs.stream()
+                .filter(pair -> pair.isRelative(picked))
+                .forEach(Pair::enable);
     }
 
     private void addSelectedToResult() {
