@@ -13,12 +13,16 @@ For example, Suppose we have 4 guys(A,B,C,D) in the team, the perfect schedule i
 
 It's easy to figure out manually when the team size is small, but when the team getting bigger, it's hard to make a perfect schedule.
 So this project is to help you make a pair plan automatically even with a big team size.
+
 ## How to use
 In the `PairGenerator.class`, replace the team member's name. If you want to add more member, just add them into the set `teamMembers`
 then run the application, you can see the result printed in the console.
 
+Note: If the team size is and odd, the application will add one member call `Nobody`(see PairUtils) to the team, which means that when we generate the pair schedule, 
+**we always use even team size**.
+
 ## version list
-### V2
+### version V2
 This version change the algorithm,and solves the bug in V1 that the program will break down when team size get bigger.
 It's quickly when the team size is small, but the team size getting bigger, it will be slowly, I will try to optimize performance in latter version
 
