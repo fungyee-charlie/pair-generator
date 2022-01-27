@@ -6,20 +6,21 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class PairGeneratorTest {
+public class SolutionGeneratorTest {
     @Test
     public void should_return_round_number_correctly_and_member_unique_in_every_round_new() {
         Random random = new Random();
-        int randomNumber = random.nextInt(8);
+        int randomNumber = random.nextInt(20);
         int teamSize = getTeamSize(randomNumber);
         Set<String> teamMember = new HashSet<>();
         for (int index = 0; index < randomNumber; index++) {
             teamMember.add("member" + index);
         }
         SolutionGenerator solutionGenerator = new SolutionGenerator(teamMember);
-        solutionGenerator.generatePairSchedule();
+        solutionGenerator.generatePairSchedule(0, 0);
         List<List<Pair>> actualSchedule = solutionGenerator.getResult();
         boolean allRoundsContainsAllMembers = actualSchedule.stream()
                 .allMatch(everyRoundList -> getAllMemberInOneRound(everyRoundList).containsAll(new ArrayList<>(teamMember)));

@@ -14,8 +14,15 @@ public class PairGenerator {
         teamMembers.add("C");
         teamMembers.add("D");
         teamMembers.add("E");
+        teamMembers.add("F");
+        teamMembers.add("G");
+        teamMembers.add("H");
+        teamMembers.add("I");
+        teamMembers.add("J");
+        teamMembers.add("K");
+        teamMembers.add("L");
         SolutionGenerator solutionGenerator = new SolutionGenerator(teamMembers);
-        solutionGenerator.generatePairSchedule();
+        solutionGenerator.generatePairSchedule(0, 0);
         solutionGenerator.printSolution();
     }
 }

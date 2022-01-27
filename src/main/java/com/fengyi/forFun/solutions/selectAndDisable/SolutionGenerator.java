@@ -8,95 +8,100 @@ import java.util.stream.Collectors;
 
 public class SolutionGenerator {
     private List<Pair> choosablePairs;
-    private List<Pair> selectedPairs = new ArrayList<>();
-    private List<List<Pair>> disablePairs = new ArrayList<>();
-    private final int teamSize;
     private List<List<Pair>> result = new ArrayList<>();
-    List<Pair> relativePairs = new ArrayList<>();
+    private final int teamSize;
 
     public SolutionGenerator(Set<String> teamMember) {
         this.choosablePairs = PairUtils.generatePossiblePairs(teamMember);
         this.teamSize = teamMember.size();
     }
 
-    public void generatePairSchedule() {
-        if (isFinishAll()) {
-            return;
-        }
-        if (isFinishThisRound()) {
-            addSelectedToResult();
-            addDisableToChoosable();
-            clearDisableAndSelected();
-        } else {
-            if (haveNoChoice()) {
-                rollbackLastPick();
-            } else {
-                Pair picked = choosablePairs.get(0);
-                selectedPairs.add(picked);
-                disableRelativePairs(picked);
+
+    public boolean generatePairSchedule(int round, int pairIndex) {
+        if (oneRoundFinish(pairIndex)) {
+            if (!containsAllMember()) {
+                return false;
             }
+            round++;
+            addSelectedToResult();
+            enableAllChoosablePairs();
+            if (isAllRoundFinish(round)) {
+                return true;
+            }
+            pairIndex = 0;
         }
-        generatePairSchedule();
-    }
 
-    private boolean haveNoChoice() {
-        return choosablePairs.isEmpty();
-    }
-
-    private boolean isFinishThisRound() {
-        return selectedPairs.size() == getPairNumber();
-    }
-
-    private void clearDisableAndSelected() {
-        disablePairs.clear();
-        selectedPairs.clear();
-    }
-
-    private void addDisableToChoosable() {
-        choosablePairs.addAll(getAllPairFrom(disablePairs));
-    }
-
-    private void rollbackLastPick() {
-        if (selectedPairs.isEmpty()) {
-            throw new IllegalStateException("Can't not get the Answer, because this program doesn't support such a large team size");
+        for (Pair pair : choosablePairs) {
+            if (pair.isDisable() || pair.isSelected()) {
+                continue;
+            }
+            pair.markSelected();
+            pair.disable();
+            disableRelativePairs(pair);
+            if (generatePairSchedule(round, pairIndex + 1)) {
+                return true;
+            }
+            pair.cancelSelected();
+            enableRelativePairs(pair);
+            pair.enable();
         }
-        Pair lastPicked = selectedPairs.remove(selectedPairs.size() - 1);
-        List<Pair> lastDisablePairs = disablePairs.remove(disablePairs.size() - 1);
-        choosablePairs.addAll(lastDisablePairs);
-        disablePairs.add(Collections.singletonList(lastPicked));
+        return false;
     }
 
-    private List<Pair> getAllPairFrom(List<List<Pair>> listOfPairList) {
-        return listOfPairList.stream()
+    private boolean isAllRoundFinish(int round) {
+        return round == getRoundNumber();
+    }
+
+    private boolean oneRoundFinish(int pairIndex) {
+        return pairIndex == getPairNumber();
+    }
+
+    private boolean containsAllMember() {
+        int size = this.choosablePairs.stream()
+                .filter(Pair::isSelected)
+                .map(Pair::getPairMembers)
                 .flatMap(Collection::stream)
+                .collect(Collectors.toSet())
+                .size();
+        return size == this.teamSize;
+    }
+
+    private List<Pair> getSelectedPairs() {
+        return this.choosablePairs.stream()
+                .filter(Pair::isSelected)
                 .collect(Collectors.toList());
     }
 
+    private void enableAllChoosablePairs() {
+        choosablePairs.removeAll(getSelectedPairs());
+        choosablePairs.forEach(Pair::enable);
+    }
+
     private void disableRelativePairs(Pair picked) {
-        List<Pair> newChoosableList = new ArrayList<>();
         for (Pair pair : choosablePairs) {
             if (pair.isTheSamePair(picked)) {
                 continue;
             }
-            if (!pair.contains(picked)) {
-                newChoosableList.add(pair);
-            } else {
-                relativePairs.add(pair);
+            if (pair.isRelative(picked)) {
+                pair.disable();
             }
         }
-        disablePairs.add(new ArrayList<>(relativePairs));
-        relativePairs.clear();
-        choosablePairs = newChoosableList;
     }
 
-    private boolean isFinishAll() {
-        return haveNoChoice() && result.size() == getRoundNumber();
+    private void enableRelativePairs(Pair picked) {
+        for (Pair pair : choosablePairs) {
+            if (pair.isTheSamePair(picked)) {
+                continue;
+            }
+            if (pair.isRelative(picked)) {
+                pair.enable();
+            }
+        }
     }
 
     private void addSelectedToResult() {
-        result.add(new ArrayList<>(selectedPairs));
+        result.add(new ArrayList<>(getSelectedPairs()));
     }
-
 
     private int getPairNumber() {
         return (teamSize + 1) / 2;
@@ -111,7 +116,7 @@ public class SolutionGenerator {
     }
 
     public void printSolution() {
-        printNestedPairList("result:", result);
+        printNestedPairList("result", result);
     }
 
     private void printNestedPairList(String message, List<List<Pair>> pairs) {
@@ -119,27 +124,16 @@ public class SolutionGenerator {
             System.out.println(message);
         }
         for (int listIndex = 0; listIndex < pairs.size(); listIndex++) {
-            System.out.println(listIndex + ":");
-            printPairList("", pairs.get(listIndex));
+            System.out.println("Round" + listIndex + ":");
+            printPairList(pairs.get(listIndex));
         }
     }
 
-    private void printPairList(String message, List<Pair> pairs) {
-        if (!message.isEmpty()) {
-            System.out.println(message);
-        }
+    private void printPairList(List<Pair> pairs) {
         pairs.forEach(this::printPair);
-    }
-
-    private void printPair(String message, Pair pair) {
-        if (!message.isEmpty()) {
-            System.out.println(message);
-        }
-        System.out.println(pair.toString());
     }
 
     private void printPair(Pair pair) {
         System.out.println(pair.toString());
     }
 }
-

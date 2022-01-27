@@ -17,8 +17,13 @@ So this project is to help you make a pair plan automatically even with a big te
 In the `PairGenerator.class`, replace the team member's name. If you want to add more member, just add them into the set `teamMembers`
 then run the application, you can see the result printed in the console.
 
-  
-## Shortage(found at 2022.1.12)
+## version list
+### V2
+This version change the algorithm,and solves the bug in V1 that the program will break down when team size get bigger.
+It's quickly when the team size is small, but the team size getting bigger, it will be slowly, I will try to optimize performance in latter version
+
+### version V1
+Shortage(found at 2022.1.12)
 I'm sorry to inform you that, this program is not perfect.
 **It doesn't work when the team number is over than 8 member.**
 After using a random team size to test, I found that, when the team size go bigger, this program will fail get the answer,
