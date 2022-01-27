@@ -7,19 +7,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SolutionGenerator {
-    private List<Pair> choosablePairs;
+    private List<Pair> notSelectedPairs;
     private List<List<Pair>> result = new ArrayList<>();
     private final int teamSize;
+    private int rollbackTimes = 0;
 
     public SolutionGenerator(Set<String> teamMember) {
-        this.choosablePairs = PairUtils.generatePossiblePairs(teamMember);
+        this.notSelectedPairs = PairUtils.generatePossiblePairs(teamMember);
         this.teamSize = teamMember.size();
     }
 
-
     public boolean generatePairSchedule(int round, int pairIndex) {
         if (oneRoundFinish(pairIndex)) {
-            if (!containsAllMember()) {
+            if (haveDuplicateMember()) {
                 return false;
             }
             round++;
@@ -31,8 +31,8 @@ public class SolutionGenerator {
             pairIndex = 0;
         }
 
-        for (Pair pair : choosablePairs) {
-            if (pair.isDisable() || pair.isSelected()) {
+        for (Pair pair : notSelectedPairs) {
+            if (isNotAvailable(pair)) {
                 continue;
             }
             pair.markSelected();
@@ -41,11 +41,22 @@ public class SolutionGenerator {
             if (generatePairSchedule(round, pairIndex + 1)) {
                 return true;
             }
+            rollbackTimes ++;
+            System.out.println("roll back" + rollbackTimes);
             pair.cancelSelected();
             enableRelativePairs(pair);
             pair.enable();
         }
         return false;
+    }
+
+    private boolean isNotAvailable(Pair pair) {
+        return pair.isDisable() || pair.isSelected() || isRelativeOfSelected(pair);
+    }
+
+    private boolean isRelativeOfSelected(Pair pair) {
+        return getSelectedPairs().stream()
+                .anyMatch(selectedPair -> selectedPair.isRelative(pair));
     }
 
     private boolean isAllRoundFinish(int round) {
@@ -56,35 +67,35 @@ public class SolutionGenerator {
         return pairIndex == getPairNumber();
     }
 
-    private boolean containsAllMember() {
-        int size = this.choosablePairs.stream()
+    private boolean haveDuplicateMember() {
+        int size = this.notSelectedPairs.stream()
                 .filter(Pair::isSelected)
                 .map(Pair::getPairMembers)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet())
                 .size();
-        return size == this.teamSize;
+        return !(size == this.teamSize);
     }
 
     private List<Pair> getSelectedPairs() {
-        return this.choosablePairs.stream()
+        return this.notSelectedPairs.stream()
                 .filter(Pair::isSelected)
                 .collect(Collectors.toList());
     }
 
     private void enableAllChoosablePairs() {
-        choosablePairs.removeAll(getSelectedPairs());
-        choosablePairs.forEach(Pair::enable);
+        notSelectedPairs.removeAll(getSelectedPairs());
+        notSelectedPairs.forEach(Pair::enable);
     }
 
     private void disableRelativePairs(Pair picked) {
-        choosablePairs.stream()
+        notSelectedPairs.stream()
                 .filter(pair -> pair.isRelative(picked))
                 .forEach(Pair::disable);
     }
 
     private void enableRelativePairs(Pair picked) {
-        choosablePairs.stream()
+        notSelectedPairs.stream()
                 .filter(pair -> pair.isRelative(picked))
                 .forEach(Pair::enable);
     }
