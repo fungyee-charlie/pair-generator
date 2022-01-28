@@ -7,8 +7,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SolutionGenerator {
-    private List<Pair> notSelectedPairs;
-    private List<List<Pair>> result = new ArrayList<>();
+    private final List<Pair> notSelectedPairs;
+    private final List<List<Pair>> result = new ArrayList<>();
     private final int teamSize;
     private int rollbackTimes = 0;
 
@@ -24,7 +24,7 @@ public class SolutionGenerator {
             }
             round++;
             addSelectedToResult();
-            enableAllChoosablePairs();
+            enableNotSelectedPairs();
             if (isAllRoundFinish(round)) {
                 return true;
             }
@@ -68,8 +68,7 @@ public class SolutionGenerator {
     }
 
     private boolean haveDuplicateMember() {
-        int size = this.notSelectedPairs.stream()
-                .filter(Pair::isSelected)
+        int size = getSelectedPairs().stream()
                 .map(Pair::getPairMembers)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet())
@@ -83,7 +82,7 @@ public class SolutionGenerator {
                 .collect(Collectors.toList());
     }
 
-    private void enableAllChoosablePairs() {
+    private void enableNotSelectedPairs() {
         notSelectedPairs.removeAll(getSelectedPairs());
         notSelectedPairs.forEach(Pair::enable);
     }
@@ -101,7 +100,7 @@ public class SolutionGenerator {
     }
 
     private void addSelectedToResult() {
-        result.add(new ArrayList<>(getSelectedPairs()));
+        result.add(getSelectedPairs());
     }
 
     private int getPairNumber() {
