@@ -10,7 +10,6 @@ public class SolutionGenerator {
     private final List<Pair> notSelectedPairs;
     private final List<List<Pair>> result = new ArrayList<>();
     private final int teamSize;
-    private int rollbackTimes = 0;
 
     public SolutionGenerator(Set<String> teamMember) {
         this.notSelectedPairs = PairUtils.generatePossiblePairs(teamMember);
@@ -41,8 +40,6 @@ public class SolutionGenerator {
             if (generatePairSchedule(round, pairIndex + 1)) {
                 return true;
             }
-            rollbackTimes ++;
-            System.out.println("roll back" + rollbackTimes);
             pair.cancelSelected();
             enableRelativePairs(pair);
             pair.enable();
