@@ -24,7 +24,17 @@ Note: If the team size is and odd, the application will add one member call `Nob
 ## version list
 ### version V2
 This version change the algorithm,and solves the bug in V1 that the program will break down when team size get bigger.
-It's quickly when the team size is small, but the team size getting bigger, it will be slowly, I will try to optimize performance in latter version
+It's quickly when the team size is small, but the team size getting bigger, it will be slowly.
+The performance like this:
+
+|  Team size   | Calculate time  |
+|  ----  | ----  |
+| 1-12  | less than 1s |
+|14|7s|
+|16|600ms|
+|18|35s-40s|
+|20|over 5minutes|
+I will try to optimize performance in latter version
 
 ### version V1
 Shortage(found at 2022.1.12)
